@@ -1,0 +1,35 @@
+{
+	"format_version": "1.16.100",
+	"minecraft:item": {
+		"description": {
+			"identifier": "mojj:fruit_of_survival",
+			"category": "Items"
+		},
+		"components": {
+			"minecraft:use_duration": 1.6,
+			"minecraft:food": {
+				"nutrition": 4,
+				"saturation_modifier": "low",
+				"can_always_eat": true,
+				"on_consume": {
+					"event": "mojj:eat_survival"
+				}
+			},
+			"minecraft:icon": {
+				"texture": "mojj_fruit_of_survival"
+			},
+			"minecraft:use_animation": "eat",
+			"minecraft:render_offsets": "apple"
+		},
+		"events": {
+			"mojj:eat_survival": {
+				"run_command": {
+					"target" : "self",
+					"command" : [
+						"gamemode s @s"
+					]
+				}
+			}
+		}
+	}
+}

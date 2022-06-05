@@ -1,0 +1,35 @@
+{
+	"format_version": "1.16.100",
+	"minecraft:item": {
+		"description": {
+			"identifier": "mojj:potion_bottle_tp",
+			"category": "Items"
+		},
+		"components": {
+			"minecraft:use_duration": 1.6,
+			"minecraft:food": {
+				"nutrition": 4,
+				"saturation_modifier": "low",
+				"can_always_eat": true,
+				"on_consume": {
+					"event": "mojj:drink_tp_potion"
+				}
+			},
+			"minecraft:icon": {
+				"texture": "mojj_potion_bottle_tp"
+			},
+			"minecraft:use_animation": "eat",
+			"minecraft:render_offsets": "apple"
+		},
+		"events": {
+			"mojj:drink_tp_potion": {
+				"run_command": {
+					"target" : "self",
+					"command" : [
+						"tp @s 1455 70 1569"
+					]
+				}
+			}
+		}
+	}
+}

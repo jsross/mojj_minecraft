@@ -1,0 +1,18 @@
+{
+	"resource_pack_name": "The Mojj",
+	"texture_name": "atlas.items",
+	"texture_data": {
+		"mojj_potion_bottle_tp": {
+			"textures": "textures/items/potion_bottle_tp"
+		},
+		"mojj_adminite_pickaxe": {
+			"textures": "textures/items/adminite_pickaxe"
+		},
+		"mojj_fruit_of_survival": {
+			"textures": "textures/items/fruit_of_survival"
+		},
+		"mojj_fruit_of_creative": {
+			"textures": "textures/items/fruit_of_creative"
+		}
+	}
+}

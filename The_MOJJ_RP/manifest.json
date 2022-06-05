@@ -1,0 +1,18 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "Mojj BP",
+		"description": "The Mojj BP",
+		"min_engine_version": [1,16,0],
+		"uuid": "f9637680-14c5-46cd-912a-fdbcaacf0ccc",
+		"version": [1,0,0]
+	},
+	"modules": [
+		{
+			"description": "The Mojj BP",
+			"type": "resources",
+			"uuid": "b837bf63-9e56-4b4c-a987-9fdd70573887",
+			"version": [1,0,0]
+		}
+	]
+}
