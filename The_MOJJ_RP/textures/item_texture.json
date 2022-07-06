@@ -13,6 +13,12 @@
 		},
 		"mojj_fruit_of_creative": {
 			"textures": "textures/items/fruit_of_creative"
+		},
+		"mojj_meeting_stone": {
+			"textures": "textures/items/meeting_stone"
+		},
+		"mojj_travel_stone": {
+			"textures": "textures/items/travel_stone"
 		}
 	}
 }

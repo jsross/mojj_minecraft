@@ -1,0 +1,32 @@
+{
+	"format_version": "1.16.100",
+	"minecraft:item": {
+		"description": {	
+			"identifier": "mojj:travel_stone",
+			"category": "Items"
+		},
+		"components": {
+			"minecraft:max_stack_size": 1,
+			"minecraft:hand_equipped": true,
+			"minecraft:icon": {
+				"texture": "mojj_travel_stone"
+			},
+			"minecraft:on_use": {
+				"on_use": {
+					"event": "mojj:tp_to_meeting_stone",
+					"target": "self"
+				}
+			}
+		},
+		"events": {
+			"mojj:tp_to_meeting_stone": {
+				"run_command": {
+					"target" : "self",
+					"command" : [
+						"tp @s @a[hasitem={item=mojj:meeting_stone,location=slot.weapon.mainhand,slot=0}]"
+					]
+				}
+			}
+		}
+	}
+}
