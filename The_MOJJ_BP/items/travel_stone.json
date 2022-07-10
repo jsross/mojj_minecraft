@@ -22,7 +22,8 @@
 			"mojj:tp_to_meeting_stone": {
 				"run_command": {
 					"target" : "self",
-					"command" : [
+					"command": [
+						"playsound beacon.activate @s ~ ~ ~",
 						"tp @s @a[hasitem={item=mojj:meeting_stone,location=slot.weapon.mainhand,slot=0}]"
 					]
 				}
