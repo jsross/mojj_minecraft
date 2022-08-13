@@ -23,8 +23,8 @@
 				"run_command": {
 					"target" : "self",
 					"command": [
-						"playsound beacon.activate @s ~ ~ ~",
-						"tp @s @a[hasitem={item=mojj:meeting_stone,location=slot.weapon.mainhand,slot=0}]"
+						"tp @s @a[hasitem={item=mojj:meeting_stone,location=slot.weapon.mainhand,slot=0}]",
+						"playsound mojj:teleport @s ~ ~ ~"
 					]
 				}
 			}
