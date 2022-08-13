@@ -1,0 +1,9 @@
+{
+	"format_version": "1.14.0",
+	"sound_definitions": {
+		"mojj:teleport": {
+			"category": "neutral",
+			"sounds": ["sounds/45_Sleep_02"]
+		}
+	}
+}
