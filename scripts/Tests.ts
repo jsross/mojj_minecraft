@@ -2,6 +2,12 @@ import { world, system, BlockLocation, MinecraftBlockTypes } from "@minecraft/se
 import * as GameTest from "@minecraft/server-gametest";
 
 export default class Tests {
+  static initialize() {
+    GameTest.register("StarterTests", "simpleMobTest", Tests.simpleMobTest)
+      .maxTicks(410)
+      .structureName("startertests:mediumglass");
+  }
+
   static simpleMobTest(test: any) {
     const attackerId = "fox";
     const victimId = "chicken";
