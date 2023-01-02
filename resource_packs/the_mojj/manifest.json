@@ -1,0 +1,18 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Mojj Resource Pack",
+    "description": "The Mojj Resource Pack",
+    "min_engine_version": [1, 16, 0],
+    "uuid": "5b57c8cc-2958-4953-8f1a-352616d6ba9a",
+    "version": [0, 0, 0]
+  },
+  "modules": [
+    {
+      "description": "The Mojj Resource Pack",
+      "type": "resources",
+      "uuid": "bef8acc1-110b-48f8-9cfe-d5c77cd7ab5d",
+      "version": [0, 0, 0]
+    }
+  ]
+}
