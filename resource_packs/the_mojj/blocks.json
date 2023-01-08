@@ -13,5 +13,8 @@
     "isotropic": true,
     "brightness_gamma": 1,
     "sound": "stone"
+  },
+  "mojj:gate_block": {
+    "sound": "wood"
   }
 }

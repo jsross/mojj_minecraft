@@ -24,6 +24,9 @@
     },
     "die_red": {
       "textures": "textures/blocks/die_red"
+    },
+    "gate_block": {
+      "textures": "textures/blocks/gate_block.png"
     }
   }
 }

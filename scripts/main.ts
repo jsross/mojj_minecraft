@@ -3,9 +3,9 @@ import BreakTheTerracotta from "./BreakTheTerracotta.js";
 import Tests from "./Tests.js";
 
 function main() {
-  var game = new BreakTheTerracotta();
+  //var game = new BreakTheTerracotta();
 
-  world.events.tick.subscribe(game.tick.bind(game));
+  //world.events.tick.subscribe(game.tick.bind(game));
 
   Tests.initialize();
 }
