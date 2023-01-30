@@ -1,0 +1,67 @@
+{
+  "format_version": "1.19.50",
+  "minecraft:block": {
+    "description": {
+      "identifier": "mojj:gate_block",
+      "menu_category": {
+        "category": "nature"
+      },
+      "properties": {
+        "mojj:rotation": [0, 1, 2, 3, 4, 5]
+      }
+    },
+    "permutations": [
+      {
+        "condition": "query.block_property('mojj:rotation') == 2.0",
+        "components": {
+          "minecraft:rotation": [0, 0, 0]
+        }
+      },
+      {
+        "condition": "query.block_property('mojj:rotation') == 3.0",
+        "components": {
+          "minecraft:rotation": [0, 180, 0]
+        }
+      },
+      {
+        "condition": "query.block_property('mojj:rotation') == 4.0",
+        "components": {
+          "minecraft:rotation": [0, 90, 0]
+        }
+      },
+      {
+        "condition": "query.block_property('mojj:rotation') == 5.0",
+        "components": {
+          "minecraft:rotation": [0, 270, 0]
+        }
+      }
+    ],
+
+    "components": {
+      "minecraft:collision_box": false,
+      "minecraft:destructible_by_mining": false,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:geometry": "geometry.gate_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "gate_block",
+          "render_method": "blend"
+        }
+      },
+      "minecraft:light_dampening": 0,
+      "minecraft:map_color": "#49b0e3",
+      "minecraft:on_player_placing": {
+        "condition": "true",
+        "event": "set_rotation",
+        "target": "self"
+      }
+    },
+    "events": {
+      "set_rotation": {
+        "set_block_property": {
+          "mojj:rotation": "query.cardinal_facing_2d"
+        }
+      }
+    }
+  }
+}
