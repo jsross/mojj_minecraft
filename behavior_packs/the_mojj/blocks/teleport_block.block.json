@@ -1,0 +1,31 @@
+{
+  "format_version": "1.19.50",
+  "minecraft:block": {
+    "description": {
+      "identifier": "mojj:teleport_block",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:collision_box": true,
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2
+      },
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:geometry": "geometry.teleport_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "teleport_block",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:light_emission": 15,
+      "minecraft:map_color": "#fff9e3",
+      "minecraft:on_step_on": {
+        "event": "mojj:sound_the_alarm",
+        "target": "self"
+      }
+    }
+  }
+}

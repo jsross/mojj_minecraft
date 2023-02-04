@@ -27,6 +27,9 @@
     },
     "gate_block": {
       "textures": "textures/blocks/gate_block.png"
+    },
+    "teleport_block": {
+      "textures": "textures/blocks/teleport_block.png"
     }
   }
 }

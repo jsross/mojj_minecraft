@@ -8,3 +8,4 @@ item.mojj:meeting_stone=Meeting Stone
 item.mojj:travel_stone=Travel Stone
 tile.demo:die.name=Die
 tile.mojj:gate_block.name=Gate Block
+tile.mojj:teleport_block.name=Teleport Block

@@ -16,5 +16,8 @@
   },
   "mojj:gate_block": {
     "sound": "wood"
+  },
+  "teleport_block": {
+    "sound": "bone_block"
   }
 }
