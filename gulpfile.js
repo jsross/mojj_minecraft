@@ -1,6 +1,7 @@
 // === CONFIGURABLE VARIABLES
 
-const bpfoldername = "the_mojj";
+const bpfoldername = "the_mojj_bp";
+const rpfoldername = "the_mojj_rp";
 const useMinecraftPreview = false; // Whether to target the "Minecraft Preview" version of Minecraft vs. the main store version of Minecraft
 const useMinecraftDedicatedServer = false; // Whether to use Bedrock Dedicated Server - see https://www.minecraft.net/download/server/bedrock
 const dedicatedServerPath = "C:/mc/bds/1.19.0/"; // if using Bedrock Dedicated Server, where to find the extracted contents of the zip package
@@ -78,7 +79,7 @@ function clean_localmc(callbackFunction) {
     return;
   }
 
-  del([mcdir + "development_behavior_packs/" + bpfoldername, mcdir + "development_resource_packs/" + bpfoldername], {
+  del([mcdir + "development_behavior_packs/" + bpfoldername, mcdir + "development_resource_packs/" + rpfoldername], {
     force: true,
   }).then(
     (value) => {
@@ -99,8 +100,8 @@ function deploy_localmc_behavior_packs() {
 
 function deploy_localmc_resource_packs() {
   return gulp
-    .src(["build/resource_packs/" + bpfoldername + "/**/*"])
-    .pipe(gulp.dest(mcdir + "development_resource_packs/" + bpfoldername));
+    .src(["build/resource_packs/" + rpfoldername + "/**/*"])
+    .pipe(gulp.dest(mcdir + "development_resource_packs/" + rpfoldername));
 }
 
 function getTargetWorldPath() {
