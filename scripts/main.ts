@@ -1,13 +1,13 @@
-import { world, system, BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
-import BreakTheTerracotta from "./BreakTheTerracotta.js";
-import Tests from "./Tests.js";
+import * as server from "@minecraft/server";
 
 function main() {
+  console.warn("Hello, world!");
+
   //var game = new BreakTheTerracotta();
-
   //world.events.tick.subscribe(game.tick.bind(game));
-
-  Tests.initialize();
+  server.world.afterEvents.itemStartUse.subscribe((event) => {
+    console.warn(event.itemStack.typeId);
+  });
 }
 
 main();

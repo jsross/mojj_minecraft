@@ -1,56 +1,59 @@
 {
-	"format_version": "1.16.100",
-	"minecraft:item": {
-		"description": {	
-			"identifier": "mojj:adminite_pickaxe",
-			"category": ""
-		},
-		"components": {
-			"minecraft:max_stack_size": 1,
-			"minecraft:hand_equipped": true,
-			"minecraft:durability": {
-				"max_durability": 150,
-				"damage_chance": {"max": 1, "min": 0}
-			},
-			"minecraft:icon": {
-				"texture": "mojj_adminite_pickaxe"
-			},
-			"minecraft:repairable": {
-				"repair_items": [
-					{
-						"items": [
-							"mojj:adminite_pickaxe"
-						],
-						"repair_amount": 20
-					}
-				]
-			},
-			"minecraft:mining_speed": 1,
-			"minecraft:damage": 3,
-			"minecraft:enchantable": {
-				"value": 14,
-				"slot": "pickaxe"
-			},
-			"minecraft:digger": {
-				"use_efficiency": true,
-				"destroy_speeds": [
-					{"block":"bedrock", "speed": 1}
-				],
-				"on_dig": {
-					"event": "mojj:destroy_blocks"
-				}
-			},
-			"tag:minecraft:is_pickaxe": {}
-		},
-		"events": {
-			"mojj:destroy_blocks": {
-				"run_command": {
-					"target" : "self",
-					"command" : [
-						"fill ~-5 ~-5 ~-5 ~5 ~5 ~5 air 0 replace"
-					]
-				}
-			}
-		}
-	}
+  "format_version": "1.16.100",
+  "minecraft:item": {
+    "description": {
+      "identifier": "mojj:adminite_pickaxe"
+    },
+    "components": {
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:durability": {
+        "max_durability": 150,
+        "damage_chance": { "max": 1, "min": 0 }
+      },
+      "minecraft:icon": {
+        "texture": "mojj_adminite_pickaxe"
+      },
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": ["mojj:adminite_pickaxe"],
+            "repair_amount": 20
+          }
+        ]
+      },
+      "minecraft:mining_speed": 1,
+      "minecraft:damage": 3,
+      "minecraft:enchantable": {
+        "value": 14,
+        "slot": "pickaxe"
+      },
+      "minecraft:digger": {
+        "use_efficiency": true,
+        "destroy_speeds": [{ "block": "bedrock", "speed": 1 }],
+        "on_dig": {
+          "event": "mojj:adminite_pickaxe:dig_dug"
+        }
+      },
+      "minecraft:on_use": {
+        "on_use": {
+          "event": "mojj:adminite_pickaxe:item_used"
+        }
+      }
+    },
+    "events": {
+      "mojj:adminite_pickaxe:item_used": {
+        "run_command": {
+          "target": "self",
+          "command": ["say Dig Dug! 00.00.00"]
+        }
+      },
+      "mojj:adminite_pickaxe:dig_dug": {
+        "run_command": {
+          "target": "self",
+          "command": ["say Right Click 00.00.00"]
+        }
+      }
+    }
+  }
 }
