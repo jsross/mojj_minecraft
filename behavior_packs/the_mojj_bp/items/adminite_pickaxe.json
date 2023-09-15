@@ -37,7 +37,8 @@
       },
       "minecraft:on_use": {
         "on_use": {
-          "event": "mojj:adminite_pickaxe:item_used"
+          "event": "mojj:adminite_pickaxe:item_used",
+          "target": "self"
         }
       }
     },
@@ -45,7 +46,7 @@
       "mojj:adminite_pickaxe:item_used": {
         "run_command": {
           "target": "self",
-          "command": ["say Dig Dug! 00.00.00"]
+          "command": ["scriptevent mojj:admin_pickaxe_used @s"]
         }
       },
       "mojj:adminite_pickaxe:dig_dug": {
