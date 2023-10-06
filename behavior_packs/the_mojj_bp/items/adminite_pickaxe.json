@@ -30,30 +30,7 @@
       },
       "minecraft:digger": {
         "use_efficiency": true,
-        "destroy_speeds": [{ "block": "bedrock", "speed": 1 }],
-        "on_dig": {
-          "event": "mojj:adminite_pickaxe:dig_dug"
-        }
-      },
-      "minecraft:on_use": {
-        "on_use": {
-          "event": "mojj:adminite_pickaxe:item_used",
-          "target": "self"
-        }
-      }
-    },
-    "events": {
-      "mojj:adminite_pickaxe:item_used": {
-        "run_command": {
-          "target": "self",
-          "command": ["scriptevent mojj:admin_pickaxe_used @s"]
-        }
-      },
-      "mojj:adminite_pickaxe:dig_dug": {
-        "run_command": {
-          "target": "self",
-          "command": ["say Right Click 00.00.00"]
-        }
+        "destroy_speeds": [{ "block": "bedrock", "speed": 1 }]
       }
     }
   }

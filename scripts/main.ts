@@ -56,103 +56,89 @@ function onAdminitePickaxeHitBlock(itemStack: ItemStack, block: Block, direction
 
 function removeBlocks(
   dimension: Dimension,
-  anchor: Vector3,
+  origin: Vector3,
   width: number,
   height: number,
   length: number,
-  direction: Direction
+  face: Direction
 ) {
-  let begin;
-  let end;
+  let begin: Vector3 = getLowerNorthWestBlockLocation(origin, width, height, length, face);
 
-  switch (direction) {
+  let end: Vector3 = {
+    x: begin.x + width - 1,
+    y: begin.y + height - 1,
+    z: begin.z + length - 1,
+  };
+
+  console.warn(
+    `origin: { x: ${origin.x}, y: ${origin.y}, z: ${origin.z}} \nbegin { x: ${begin.x}, y: ${begin.y}, z: ${begin.z}},\n end: { x: ${end.x}, y: ${end.y}, z: ${end.z}}`
+  );
+
+  let perm = BlockPermutation.resolve("air");
+  dimension.fillBlocks(begin, end, perm);
+}
+
+function getLowerNorthWestBlockLocation(
+  origin: Vector3,
+  width: number,
+  height: number,
+  length: number,
+  face: Direction
+): Vector3 {
+  let begin: Vector3;
+
+  switch (face) {
     case Direction.North:
-      end = {
-        x: anchor.x + Math.ceil(width / 2),
-        y: anchor.y + height,
-        z: Math.ceil(anchor.z - length / 2),
-      };
-
       begin = {
-        x: anchor.x - Math.ceil(width / 2),
-        y: anchor.y,
-        z: anchor.z + Math.ceil(length / 2),
+        x: origin.x - Math.floor(width / 2),
+        y: origin.y - Math.floor(height / 2),
+        z: origin.z,
       };
       break;
     case Direction.South:
-      end = {
-        x: anchor.x + Math.ceil(width / 2),
-        y: anchor.y + height,
-        z: anchor.z + Math.ceil(length / 2),
+      begin = {
+        x: origin.x - Math.floor(width / 2),
+        y: origin.y - Math.floor(height / 2),
+        z: origin.z - (length - 1),
       };
 
-      begin = {
-        x: anchor.x - Math.ceil(width / 2),
-        y: anchor.y,
-        z: anchor.z - Math.ceil(length / 2),
-      };
       break;
     case Direction.East:
-      end = {
-        x: anchor.x + Math.ceil(length / 2),
-        y: anchor.y + height,
-        z: anchor.z + Math.ceil(width / 2),
+      begin = {
+        x: origin.x - (length - 1),
+        y: origin.y - Math.floor(height / 2),
+        z: origin.z - Math.floor(width / 2),
       };
 
-      begin = {
-        x: anchor.x - Math.ceil(length / 2),
-        y: anchor.y,
-        z: anchor.z - Math.ceil(width / 2),
-      };
       break;
-    case Direction.West:
-      end = {
-        x: anchor.x - Math.ceil(length / 2),
-        y: anchor.y + height,
-        z: anchor.z + Math.ceil(width / 2),
+    case Direction.West: //todo
+      begin = {
+        x: origin.x,
+        y: origin.y - Math.floor(height / 2),
+        z: origin.z + Math.floor(width / 2),
       };
 
+      break;
+    case Direction.Down:
       begin = {
-        x: anchor.x + Math.ceil(length / 2),
-        y: anchor.y,
-        z: anchor.z - Math.ceil(width / 2),
+        x: origin.x - Math.floor(width / 2),
+        y: origin.y - Math.floor(height / 2),
+        z: origin.z - 2 * Math.floor(length / 2),
       };
       break;
     case Direction.Up:
-      end = {
-        x: anchor.x + width / 2,
-        y: anchor.y + height,
-        z: anchor.z + length / 2,
-      };
-
       begin = {
-        x: anchor.x - Math.ceil(width / 2),
-        y: anchor.y,
-        z: anchor.z - Math.ceil(length / 2),
+        x: origin.x - Math.floor(width / 2),
+        y: origin.y - Math.floor(height / 2),
+        z: origin.z - 2 * Math.floor(length / 2),
       };
       break;
-    case Direction.Down:
-      end = {
-        x: anchor.x + Math.ceil(width / 2),
-        y: anchor.y,
-        z: anchor.z + Math.ceil(length / 2),
-      };
 
-      begin = {
-        x: anchor.x - Math.ceil(width / 2),
-        y: anchor.y - height,
-        z: anchor.z - Math.ceil(length / 2),
-      };
-      break;
     default:
       throw new Error("Invalid direction provided.");
   }
 
-  console.warn(
-    `fillBlocks: begin { x: ${begin.x}, y: ${begin.y}, z: ${begin.z}}, end: { x: ${end.x}, y: ${end.y}, z: ${end.z}}`
-  );
-  let perm = BlockPermutation.resolve("air");
-  dimension.fillBlocks(end, begin, perm);
+  return begin;
 }
 
 function onAdminite_pickaxe_used(player: Player, slot: number, itemStack: ItemStack) {
