@@ -16,6 +16,8 @@ import { AdminPickConfigModalForm } from "./admin_pick_config_modal_form";
 
 function main() {
   console.warn("Hello, world!");
+  console.warn("Raw Direction value for North: " + Direction.North);
+  console.warn("Raw Direction value for West: " + Direction.West);
 
   world.afterEvents.itemUse.subscribe((event: ItemUseAfterEvent) => {
     var player = event.source as Player;
@@ -64,11 +66,36 @@ function removeBlocks(
 ) {
   let begin: Vector3 = getLowerNorthWestBlockLocation(origin, width, height, length, face);
 
-  let end: Vector3 = {
-    x: begin.x + width - 1,
-    y: begin.y + height - 1,
-    z: begin.z + length - 1,
-  };
+  let end: Vector3;
+
+  switch (face) {
+    case Direction.North:
+    case Direction.South:
+      end = {
+        x: begin.x + width - 1,
+        y: begin.y + height - 1,
+        z: begin.z + length - 1,
+      };
+      break;
+    case Direction.East:
+    case Direction.West:
+      end = {
+        x: begin.x + length - 1,
+        y: begin.y + height - 1,
+        z: begin.z + width - 1,
+      };
+      break;
+    case Direction.Up:
+    case Direction.Down:
+      end = {
+        x: begin.x + length - 1,
+        y: begin.y + height - 1,
+        z: begin.z + width - 1,
+      }; // Adjust based on the behavior you want for Up and Down
+      break;
+    default:
+      throw new Error("Invalid direction provided.");
+  }
 
   console.warn(
     `origin: { x: ${origin.x}, y: ${origin.y}, z: ${origin.z}} \nbegin { x: ${begin.x}, y: ${begin.y}, z: ${begin.z}},\n end: { x: ${end.x}, y: ${end.y}, z: ${end.z}}`
@@ -87,8 +114,13 @@ function getLowerNorthWestBlockLocation(
 ): Vector3 {
   let begin: Vector3;
 
+  console.warn(
+    `getLowerNorthWestBlockLocation called. width: ${width}, height ${height}, length: ${length}, face: ${face})`
+  );
+
   switch (face) {
     case Direction.North:
+      console.warn("North Calc");
       begin = {
         x: origin.x - Math.floor(width / 2),
         y: origin.y - Math.floor(height / 2),
@@ -96,14 +128,16 @@ function getLowerNorthWestBlockLocation(
       };
       break;
     case Direction.South:
+      console.warn("South Calc");
       begin = {
         x: origin.x - Math.floor(width / 2),
         y: origin.y - Math.floor(height / 2),
         z: origin.z - (length - 1),
       };
-
       break;
     case Direction.East:
+      console.warn("East Calc");
+
       begin = {
         x: origin.x - (length - 1),
         y: origin.y - Math.floor(height / 2),
@@ -111,15 +145,15 @@ function getLowerNorthWestBlockLocation(
       };
 
       break;
-    case Direction.West: //todo
+    case Direction.West:
       begin = {
         x: origin.x,
         y: origin.y - Math.floor(height / 2),
-        z: origin.z + Math.floor(width / 2),
+        z: origin.z - Math.floor(width / 2),
       };
-
       break;
     case Direction.Down:
+      console.warn("Down Calc");
       begin = {
         x: origin.x - Math.floor(width / 2),
         y: origin.y - Math.floor(height / 2),
@@ -127,6 +161,7 @@ function getLowerNorthWestBlockLocation(
       };
       break;
     case Direction.Up:
+      console.warn("Up Calc");
       begin = {
         x: origin.x - Math.floor(width / 2),
         y: origin.y - Math.floor(height / 2),
@@ -137,6 +172,8 @@ function getLowerNorthWestBlockLocation(
     default:
       throw new Error("Invalid direction provided.");
   }
+
+  console.warn(`Calculated begin for ${face}: { x: ${begin.x}, y: ${begin.y}, z: ${begin.z}}`);
 
   return begin;
 }
