@@ -16,8 +16,6 @@ import { AdminPickConfigModalForm } from "./admin_pick_config_modal_form";
 
 function main() {
   console.warn("Hello, world!");
-  console.warn("Raw Direction value for North: " + Direction.North);
-  console.warn("Raw Direction value for West: " + Direction.West);
 
   world.afterEvents.itemUse.subscribe((event: ItemUseAfterEvent) => {
     var player = event.source as Player;
