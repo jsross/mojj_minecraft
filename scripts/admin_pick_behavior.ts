@@ -1,20 +1,24 @@
 import {
-  Block,
   BlockPermutation,
-  Direction,
   EntityHitBlockAfterEvent,
   EntityInventoryComponent,
   ItemStack,
   ItemUseAfterEvent,
   Player,
-  Vector3,
 } from "@minecraft/server";
 import "./player_extensions";
 import { AdminPickConfigModalForm } from "./admin_pick_config_modal_form";
-import { Rectangle } from "./rectangle";
+import { IAreaCalculator } from "./area_calculator";
+import { Behavior } from "./behavior";
 
-export class AdminPickBehavior {
-  onHitBlock(event: EntityHitBlockAfterEvent): void {
+export class AdminPickBehavior implements Behavior {
+  private areaCalculator: IAreaCalculator;
+
+  constructor(areaCalculator: IAreaCalculator) {
+    this.areaCalculator = areaCalculator;
+  }
+
+  public onHitBlock(event: EntityHitBlockAfterEvent): void {
     if (event.damagingEntity.typeId != "minecraft:player") {
       return;
     }
@@ -27,7 +31,7 @@ export class AdminPickBehavior {
     }
 
     let data = this.getAdminPickData(heldItem);
-    let area = this.getRectangle(
+    let area = this.areaCalculator.calculateAreaForBlock(
       block,
       event.blockFace,
       data.width,
@@ -47,7 +51,7 @@ export class AdminPickBehavior {
     block.dimension.fillBlocks(area.getLowerNwCoordinates(), area.getUpperSeCoordinates(), perm);
   }
 
-  onUsed(event: ItemUseAfterEvent): void {
+  public onUsed(event: ItemUseAfterEvent): void {
     if (event.itemStack.typeId != "mojj:adminite_pickaxe") {
       return;
     }
@@ -64,6 +68,22 @@ export class AdminPickBehavior {
     let form = new AdminPickConfigModalForm(data.width, data.height, data.length);
 
     form.show(player).then(this.handleFormResponse.bind(this, player, heldItem));
+  }
+
+  onEvent(eventName: string, event: any): void {
+    const eventMap = this.getEventMap();
+    const handler = eventMap.get(eventName);
+    if (handler) {
+      handler(event);
+    }
+  }
+
+  getEventMap(): Map<string, Function> {
+    const eventMap = new Map<string, Function>();
+    eventMap.set("itemUse", this.onUsed);
+    eventMap.set("entityHitBlock", this.onHitBlock);
+
+    return eventMap;
   }
 
   private handleFormResponse(player: Player, heldItem: ItemStack, formData: any) {
@@ -108,182 +128,5 @@ export class AdminPickBehavior {
     lore[0] = JSON.stringify(data);
 
     itemStack.setLore(lore);
-  }
-
-  private getRectangle(origin: Block, face: Direction, width: any, height: any, length: any, playerFacing: Direction) {
-    let lowNw: Vector3 = this.getLowerNorthWestBlockLocation(origin, width, height, length, face, playerFacing);
-
-    let upSe: Vector3 = this.getUpperSouthEastBlockLocation(origin, width, height, length, face, playerFacing);
-
-    let rectangle = new Rectangle(lowNw, upSe);
-
-    return rectangle;
-  }
-
-  private getUpperSouthEastBlockLocation(
-    origin: Vector3,
-    width: number,
-    height: number,
-    length: number,
-    face: Direction,
-    playerFacing: Direction
-  ): Vector3 {
-    let upSe: Vector3;
-
-    switch (face) {
-      case Direction.North:
-        upSe = {
-          x: origin.x + Math.floor(width / 2),
-          y: origin.y + Math.floor(height / 2),
-          z: origin.z + (length - 1),
-        };
-        break;
-      case Direction.South:
-        upSe = {
-          x: origin.x + Math.floor(width / 2),
-          y: origin.y + Math.floor(height / 2),
-          z: origin.z,
-        };
-        break;
-      case Direction.East:
-        upSe = {
-          x: origin.x,
-          y: origin.y + Math.floor(height / 2),
-          z: origin.z + Math.floor(width / 2),
-        };
-
-        break;
-      case Direction.West:
-        upSe = {
-          x: origin.x + (length - 1),
-          y: origin.y + Math.floor(height / 2),
-          z: origin.z + Math.floor(width / 2),
-        };
-        break;
-      case Direction.Down:
-        if (playerFacing == Direction.East || playerFacing == Direction.West) {
-          // East or West
-          upSe = {
-            x: origin.x + Math.floor(height / 2),
-            y: origin.y,
-            z: origin.z + Math.floor(width / 2),
-          };
-        } else {
-          // North or South
-          upSe = {
-            x: origin.x + Math.floor(width / 2),
-            y: origin.y,
-            z: origin.z + Math.floor(height / 2),
-          };
-        }
-
-        break;
-      case Direction.Up:
-        // Determine which quadrant or side of the block the player is standing on
-        if (playerFacing == Direction.East || playerFacing == Direction.West) {
-          // East or West
-          upSe = {
-            x: origin.x + Math.floor(height / 2),
-            y: origin.y,
-            z: origin.z + Math.floor(width / 2),
-          };
-        } else {
-          // North or South
-          upSe = {
-            x: origin.x + Math.floor(width / 2),
-            y: origin.y,
-            z: origin.z + Math.floor(height / 2),
-          };
-        }
-        break;
-
-      default:
-        throw new Error("Invalid direction provided.");
-    }
-
-    return upSe;
-  }
-
-  private getLowerNorthWestBlockLocation(
-    origin: Vector3,
-    width: number,
-    height: number,
-    length: number,
-    face: Direction,
-    playerFacing: Direction
-  ): Vector3 {
-    let loNw: Vector3;
-
-    switch (face) {
-      case Direction.North:
-        loNw = {
-          x: origin.x - Math.floor(width / 2),
-          y: origin.y - Math.floor(height / 2),
-          z: origin.z,
-        };
-        break;
-      case Direction.South:
-        loNw = {
-          x: origin.x - Math.floor(width / 2),
-          y: origin.y - Math.floor(height / 2),
-          z: origin.z - (length - 1),
-        };
-        break;
-      case Direction.East:
-        loNw = {
-          x: origin.x - (length - 1),
-          y: origin.y - Math.floor(height / 2),
-          z: origin.z - Math.floor(width / 2),
-        };
-
-        break;
-      case Direction.West:
-        loNw = {
-          x: origin.x,
-          y: origin.y - Math.floor(height / 2),
-          z: origin.z - Math.floor(width / 2),
-        };
-        break;
-      case Direction.Down:
-        if (playerFacing == Direction.East || playerFacing == Direction.West) {
-          // East or West
-          loNw = {
-            x: origin.x - Math.floor(height / 2),
-            y: origin.y + (length - 1),
-            z: origin.z - Math.floor(width / 2),
-          };
-        } else {
-          // North or South
-          loNw = {
-            x: origin.x - Math.floor(width / 2),
-            y: origin.y + (length - 1),
-            z: origin.z - Math.floor(height / 2),
-          };
-        }
-
-        break;
-      case Direction.Up:
-        if (playerFacing == Direction.East || playerFacing == Direction.West) {
-          // East or West
-          loNw = {
-            x: origin.x - Math.floor(height / 2),
-            y: origin.y - (length - 1),
-            z: origin.z - Math.floor(width / 2),
-          };
-        } else {
-          // North or South
-          loNw = {
-            x: origin.x - Math.floor(width / 2),
-            y: origin.y - (length - 1),
-            z: origin.z - Math.floor(height / 2),
-          };
-        }
-        break;
-
-      default:
-        throw new Error("Invalid direction provided.");
-    }
-
-    return loNw;
   }
 }

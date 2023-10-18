@@ -1,13 +1,17 @@
-import { world } from "@minecraft/server";
 import { AdminPickBehavior } from "./admin_pick_behavior";
+import { AreaCalculator } from "./area_calculator";
+import { BehaviorManager } from "./behavior_manager";
 
 function main() {
-  console.warn("Hello, world!");
+  console.warn("Hello, world 2!");
 
-  let behavior = new AdminPickBehavior();
+  const areaCalculator = new AreaCalculator();
+  const behavior = new AdminPickBehavior(areaCalculator);
+  const behaviorManager = new BehaviorManager();
 
-  world.afterEvents.itemUse.subscribe(behavior.onUsed.bind(behavior));
-  world.afterEvents.entityHitBlock.subscribe(behavior.onHitBlock.bind(behavior));
+  behaviorManager.registerBehavior(behavior);
+
+  // ... rest of the code ...
 }
 
 main();
