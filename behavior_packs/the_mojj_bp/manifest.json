@@ -4,7 +4,7 @@
     "name": "The Mojj Behavior Pack",
     "description": "The Mojj Behavior Pack",
     "uuid": "0bdaa9fb-0585-479b-83c2-49dd78246103",
-    "version": [0, 0, 0],
+    "version": [0, 0, 1],
     "min_engine_version": [1, 19, 40]
   },
   "modules": [
@@ -12,21 +12,21 @@
       "description": "The Mojj Behavior Pack",
       "type": "data",
       "uuid": "070d2fe3-723c-40b7-bc55-af6d50eef05c",
-      "version": [0, 0, 0]
+      "version": [0, 0, 1]
     },
     {
       "description": "Script resources",
       "language": "javascript",
       "type": "script",
       "uuid": "9aeaf0b2-0e69-471c-a6e5-ad17c574f8d7",
-      "version": [0, 0, 0],
+      "version": [0, 0, 1],
       "entry": "scripts/main.js"
     }
   ],
   "dependencies": [
     {
       "uuid": "5b57c8cc-2958-4953-8f1a-352616d6ba9a",
-      "version": [0, 0, 0]
+      "version": [0, 0, 1]
     },
     {
       "module_name": "@minecraft/server",
