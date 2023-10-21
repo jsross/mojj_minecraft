@@ -1,13 +1,17 @@
-import { world, system, BlockLocation, MinecraftBlockTypes } from "@minecraft/server";
-import BreakTheTerracotta from "./BreakTheTerracotta.js";
-import Tests from "./Tests.js";
+import { AdminPickBehavior } from "./admin_pick_behavior";
+import { AreaCalculator } from "./area_calculator";
+import { BehaviorManager } from "./behavior_manager";
 
 function main() {
-  //var game = new BreakTheTerracotta();
+  console.warn("Hello, world 2!");
 
-  //world.events.tick.subscribe(game.tick.bind(game));
+  const areaCalculator = new AreaCalculator();
+  const behavior = new AdminPickBehavior(areaCalculator);
+  const behaviorManager = new BehaviorManager();
 
-  Tests.initialize();
+  behaviorManager.registerBehavior(behavior);
+
+  // ... rest of the code ...
 }
 
 main();
