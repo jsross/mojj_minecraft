@@ -8,3 +8,5 @@ item.mojj:meeting_stone=Meeting Stone
 item.mojj:travel_stone=Travel Stone
 tile.demo:die.name=Die
 tile.mojj:gate_block.name=Gate Block
+entity.mojj:waypoint.name=Waypoint
+item.spawn_egg.entity.mojj:waypoint.name=Spawn Waypoint
