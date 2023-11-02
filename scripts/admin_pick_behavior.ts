@@ -11,10 +11,12 @@ import { AdminPickConfigModalForm } from "./admin_pick_config_modal_form";
 import { IAreaCalculator } from "./area_calculator";
 import { Behavior } from "./behavior";
 
-export class AdminPickBehavior implements Behavior {
+export class AdminPickBehavior extends Behavior {
   private areaCalculator: IAreaCalculator;
 
   constructor(areaCalculator: IAreaCalculator) {
+    super();
+
     this.areaCalculator = areaCalculator;
   }
 
@@ -68,14 +70,6 @@ export class AdminPickBehavior implements Behavior {
     let form = new AdminPickConfigModalForm(data.width, data.height, data.length);
 
     form.show(player).then(this.handleFormResponse.bind(this, player, heldItem));
-  }
-
-  onEvent(eventName: string, event: any): void {
-    const eventMap = this.getEventMap();
-    const handler = eventMap.get(eventName);
-    if (handler) {
-      handler(event);
-    }
   }
 
   getEventMap(): Map<string, Function> {
