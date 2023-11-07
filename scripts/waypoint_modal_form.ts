@@ -1,4 +1,3 @@
-import { Player } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 
 export class WaypointModalForm extends ModalFormData {
@@ -13,8 +12,7 @@ export class WaypointModalForm extends ModalFormData {
   }
 
   private init() {
-    this.title("Example Modal Controls for ModalFormData");
-
+    this.title("Select a waypoint:");
     this.dropdown("Waypoints", this._waypoints, 0);
   }
 }

@@ -7,6 +7,7 @@ import {
   Player,
 } from "@minecraft/server";
 import "./player_extensions";
+import "./entity_extensions";
 import { AdminPickConfigModalForm } from "./admin_pick_config_modal_form";
 import { IAreaCalculator } from "./area_calculator";
 import { Behavior } from "./behavior";
