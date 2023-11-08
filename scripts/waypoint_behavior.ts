@@ -1,15 +1,15 @@
 import {
   Player,
   PlayerInteractWithEntityAfterEvent,
-  EntityQueryOptions,
   Entity,
   TeleportOptions,
   Vector3,
-  world,
   EntitySpawnAfterEvent,
   EntityRemoveAfterEvent,
+  DataDrivenEntityTriggerBeforeEvent,
 } from "@minecraft/server";
 import "./entity_extensions";
+import "./player_extensions";
 
 import { Behavior } from "./behavior";
 import { WaypointModalForm } from "./waypoint_modal_form";
@@ -37,22 +37,41 @@ export class WaypointBehavior extends Behavior {
     this._waypointRepository.addWaypoint(waypoint);
   }
 
+  public onDataDrivenEvent(event: DataDrivenEntityTriggerBeforeEvent): void {
+    if (event.id != "mojj:waypoint:on_named") {
+      return;
+    }
+
+    console.warn("onDataDrivenEvent: " + JSON.stringify(event));
+
+    let entity: Entity = event.entity as Entity;
+
+    var waypoint = this._waypointRepository.getWaypoint(entity.id);
+
+    waypoint.name = entity.nameTag;
+
+    this._waypointRepository.updateWaypoint(waypoint);
+  }
+
   public onRemoved(event: EntityRemoveAfterEvent): void {
     if (event.typeId != "mojj:waypoint") {
       return;
     }
 
-    console.warn("onRemoved");
-
     this._waypointRepository.removeWaypoint(event.removedEntityId);
   }
 
   public onPlayerInteract(event: PlayerInteractWithEntityAfterEvent): void {
+    const target = event.target;
+    const player = event.player;
+
     if (event.target.typeId != "mojj:waypoint") {
       return;
     }
 
-    const player = event.player;
+    if (player.getHeldItem()?.typeId == "minecraft:name_tag") {
+      return;
+    }
 
     const waypoints: Waypoint[] = this._waypointRepository.getWaypoints();
 
@@ -61,9 +80,6 @@ export class WaypointBehavior extends Behavior {
 
       return;
     }
-
-    console.warn("Waypoint: " + JSON.stringify(waypoints[0]));
-    console.warn("ID: " + waypoints[0].id);
 
     let waypointNames = waypoints.map((waypoint) => (waypoint.name ? waypoint.name : "Unnammed"));
 
@@ -74,9 +90,11 @@ export class WaypointBehavior extends Behavior {
 
   getEventMap(): Map<string, Function> {
     const eventMap = new Map<string, Function>();
+
     eventMap.set("playerInteractWithEntity", this.onPlayerInteract);
     eventMap.set("entitySpawn", this.onSpawn);
     eventMap.set("entityRemove", this.onRemoved);
+    eventMap.set("dataDrivenEntityTriggerEvent", this.onDataDrivenEvent);
 
     return eventMap;
   }

@@ -3,7 +3,9 @@ import { Waypoint } from "./waypoint";
 
 export interface IWaypointRepository {
   getWaypoints(): Waypoint[];
+  getWaypoint(id: string): Waypoint;
   addWaypoint(waypoint: Waypoint): void;
+  updateWaypoint(waypoint: Waypoint): void;
   removeWaypoint(id: string): void;
 }
 
@@ -20,7 +22,23 @@ export class WaypointRepository implements IWaypointRepository {
     return results;
   }
 
+  public getWaypoint(id: string): Waypoint {
+    var dictionary = this.getWaypointDictionary();
+
+    var waypoint = dictionary[id] as Waypoint;
+
+    return waypoint;
+  }
+
   public addWaypoint(waypoint: Waypoint): void {
+    var waypointDictionary = this.getWaypointDictionary();
+
+    waypointDictionary[waypoint.id] = waypoint;
+
+    this.saveWaypoints(waypointDictionary);
+  }
+
+  public updateWaypoint(waypoint: Waypoint): void {
     var waypointDictionary = this.getWaypointDictionary();
 
     waypointDictionary[waypoint.id] = waypoint;
@@ -66,8 +84,6 @@ export class WaypointRepository implements IWaypointRepository {
       let waypointObject: any = waypoints[property] as Waypoint;
 
       results[property] = waypointObject;
-
-      //console.warn(JSON.stringify(waypoint.teleportLocation))
     }
 
     return waypoints;
