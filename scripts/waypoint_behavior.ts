@@ -8,6 +8,7 @@ import {
   EntityRemoveAfterEvent,
   DataDrivenEntityTriggerBeforeEvent,
   EntityLoadAfterEvent,
+  world,
 } from "@minecraft/server";
 import "./entity_extensions";
 import "./player_extensions";
@@ -30,7 +31,6 @@ export class WaypointBehavior extends Behavior {
     if (event.entity.typeId != "mojj:waypoint") {
       return;
     }
-
     let entity = event.entity as Entity;
 
     let waypoint = this.createWaypoint(entity);
@@ -151,6 +151,7 @@ export class WaypointBehavior extends Behavior {
     let waypoint = {
       id: entity.id,
       name: entity.nameTag,
+      dimensionId: entity.dimension.id,
       wayPointLocation: entityLocation,
       teleportLocation: teleportLocation,
       facingLocation: facingLocation,
@@ -168,7 +169,13 @@ export class WaypointBehavior extends Behavior {
 
     let waypoint = waypoints[index] as Waypoint;
 
-    let options = { checkForBlocks: true, facingLocation: waypoint.facingLocation } as TeleportOptions;
+    let dimenion = world.getDimension(waypoint.dimensionId);
+
+    let options = {
+      checkForBlocks: true,
+      facingLocation: waypoint.facingLocation,
+      dimension: dimenion,
+    } as TeleportOptions;
 
     let teleportLocation = waypoint.teleportLocation as Vector3;
 
