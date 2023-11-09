@@ -166,8 +166,6 @@ export class WaypointBehavior extends Behavior {
 
     let teleportLocation = waypoint.teleportLocation as Vector3;
 
-    console.warn("TP:" + JSON.stringify(teleportLocation));
-
-    player.teleport(teleportLocation);
+    player.teleport(teleportLocation, options);
   }
 }
