@@ -73,7 +73,9 @@ export class WaypointBehavior extends Behavior {
       return;
     }
 
-    const waypoints: Waypoint[] = this._waypointRepository.getWaypoints();
+    const waypoints: Waypoint[] = this._waypointRepository
+      .getWaypoints()
+      .filter((waypoint) => waypoint.id != target.id);
 
     if (waypoints.length == 0) {
       player.sendMessage("No other waypoints found");
