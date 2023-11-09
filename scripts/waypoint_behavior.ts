@@ -7,6 +7,7 @@ import {
   EntitySpawnAfterEvent,
   EntityRemoveAfterEvent,
   DataDrivenEntityTriggerBeforeEvent,
+  EntityLoadAfterEvent,
 } from "@minecraft/server";
 import "./entity_extensions";
 import "./player_extensions";
@@ -34,7 +35,18 @@ export class WaypointBehavior extends Behavior {
 
     let waypoint = this.createWaypoint(entity);
 
-    this._waypointRepository.addWaypoint(waypoint);
+    this._waypointRepository.upsertWaypoint(waypoint);
+  }
+
+  public onLoaded(event: EntityLoadAfterEvent): void {
+    if (event.entity.typeId != "mojj:waypoint") {
+      return;
+    }
+
+    let entity = event.entity as Entity;
+
+    var waypoint = this.createWaypoint(entity);
+    this._waypointRepository.upsertWaypoint(waypoint);
   }
 
   public onDataDrivenEvent(event: DataDrivenEntityTriggerBeforeEvent): void {
@@ -42,15 +54,13 @@ export class WaypointBehavior extends Behavior {
       return;
     }
 
-    console.warn("onDataDrivenEvent: " + JSON.stringify(event));
-
     let entity: Entity = event.entity as Entity;
 
     var waypoint = this._waypointRepository.getWaypoint(entity.id);
 
     waypoint.name = entity.nameTag;
 
-    this._waypointRepository.updateWaypoint(waypoint);
+    this._waypointRepository.upsertWaypoint(waypoint);
   }
 
   public onRemoved(event: EntityRemoveAfterEvent): void {
@@ -97,6 +107,7 @@ export class WaypointBehavior extends Behavior {
     eventMap.set("entitySpawn", this.onSpawn);
     eventMap.set("entityRemove", this.onRemoved);
     eventMap.set("dataDrivenEntityTriggerEvent", this.onDataDrivenEvent);
+    eventMap.set("entityLoad", this.onLoaded);
 
     return eventMap;
   }
@@ -157,12 +168,7 @@ export class WaypointBehavior extends Behavior {
 
     let waypoint = waypoints[index] as Waypoint;
 
-    console.warn("Waypoint:" + JSON.stringify(waypoint));
-
     let options = { checkForBlocks: true, facingLocation: waypoint.facingLocation } as TeleportOptions;
-
-    console.warn("TP o:" + waypoint.teleportLocation);
-    console.warn("TP os:" + JSON.stringify(waypoint.teleportLocation));
 
     let teleportLocation = waypoint.teleportLocation as Vector3;
 

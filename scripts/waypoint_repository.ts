@@ -1,11 +1,10 @@
-import { Vector3, world } from "@minecraft/server";
+import { world } from "@minecraft/server";
 import { Waypoint } from "./waypoint";
 
 export interface IWaypointRepository {
   getWaypoints(): Waypoint[];
   getWaypoint(id: string): Waypoint;
-  addWaypoint(waypoint: Waypoint): void;
-  updateWaypoint(waypoint: Waypoint): void;
+  upsertWaypoint(waypoint: Waypoint): void;
   removeWaypoint(id: string): void;
 }
 
@@ -30,15 +29,7 @@ export class WaypointRepository implements IWaypointRepository {
     return waypoint;
   }
 
-  public addWaypoint(waypoint: Waypoint): void {
-    var waypointDictionary = this.getWaypointDictionary();
-
-    waypointDictionary[waypoint.id] = waypoint;
-
-    this.saveWaypoints(waypointDictionary);
-  }
-
-  public updateWaypoint(waypoint: Waypoint): void {
+  public upsertWaypoint(waypoint: Waypoint): void {
     var waypointDictionary = this.getWaypointDictionary();
 
     waypointDictionary[waypoint.id] = waypoint;
