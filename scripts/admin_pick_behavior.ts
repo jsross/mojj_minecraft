@@ -73,10 +73,16 @@ export class AdminPickBehavior extends Behavior {
     form.show(player).then(this.handleFormResponse.bind(this, player, heldItem));
   }
 
-  getEventMap(): Map<string, Function> {
+  getAfterEventMap(): Map<string, Function> {
     const eventMap = new Map<string, Function>();
     eventMap.set("itemUse", this.onUsed);
     eventMap.set("entityHitBlock", this.onHitBlock);
+
+    return eventMap;
+  }
+
+  getBeforeEventMap(): Map<string, Function> {
+    const eventMap = new Map<string, Function>();
 
     return eventMap;
   }

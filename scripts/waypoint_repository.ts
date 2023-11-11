@@ -5,6 +5,7 @@ export interface IWaypointRepository {
   getWaypoints(): Waypoint[];
   getWaypoint(id: string): Waypoint;
   upsertWaypoint(waypoint: Waypoint): void;
+  reset(): void;
   removeWaypoint(id: string): void;
 }
 

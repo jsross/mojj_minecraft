@@ -1,11 +1,12 @@
 export abstract class Behavior {
   onEvent(eventName: string, event: any): void {
-    const eventMap = this.getEventMap();
+    const eventMap = this.getAfterEventMap();
     const handler = eventMap.get(eventName);
     if (handler) {
       handler(event);
     }
   }
 
-  abstract getEventMap(): Map<string, Function>;
+  abstract getAfterEventMap(): Map<string, Function>;
+  abstract getBeforeEventMap(): Map<string, Function>;
 }

@@ -9,6 +9,7 @@ import {
   DataDrivenEntityTriggerBeforeEvent,
   EntityLoadAfterEvent,
   world,
+  ChatSendBeforeEvent,
 } from "@minecraft/server";
 import "./entity_extensions";
 import "./player_extensions";
@@ -31,6 +32,7 @@ export class WaypointBehavior extends Behavior {
     if (event.entity.typeId != "mojj:waypoint") {
       return;
     }
+
     let entity = event.entity as Entity;
 
     let waypoint = this.createWaypoint(entity);
@@ -100,7 +102,57 @@ export class WaypointBehavior extends Behavior {
     form.show(player).then(this.handleFormResponse.bind(this, player, waypoints));
   }
 
-  getEventMap(): Map<string, Function> {
+  // Function to handle chat commands
+  public onChat(event: ChatSendBeforeEvent): void {
+    const player = event.sender as Player;
+    const message = event.message;
+
+    const command = message.trim().toLowerCase();
+
+    console.warn("Command: ", command);
+
+    if (!command.startsWith("!wp")) {
+      return;
+    }
+
+    if (!player.isOp()) {
+      // Check if the player is an admin
+      return;
+    }
+
+    event.cancel = true; // Cancel the chat event
+
+    switch (command) {
+      case "!wp listwaypoints":
+        this.listAllWaypoints(player);
+        break;
+      case "!wp reset":
+        this.resetWaypoints(player);
+        break;
+      // ... handle other commands
+    }
+  }
+
+  // Function to list all waypoints
+  private listAllWaypoints(player: Player): void {
+    const waypoints = this._waypointRepository.getWaypoints();
+
+    if (waypoints.length === 0) {
+      player.sendMessage("No waypoints available.");
+      return;
+    }
+
+    const waypointList = waypoints.map((waypoint, index) => waypoint.toString()).join("\n");
+    player.sendMessage(waypointList);
+  }
+
+  // Function to reset waypoints
+  private resetWaypoints(player: Player): void {
+    this._waypointRepository.reset(); // Use the reset method from WaypointRepository
+    player.sendMessage("All waypoints have been reset.");
+  }
+
+  getAfterEventMap(): Map<string, Function> {
     const eventMap = new Map<string, Function>();
 
     eventMap.set("playerInteractWithEntity", this.onPlayerInteract);
@@ -108,6 +160,14 @@ export class WaypointBehavior extends Behavior {
     eventMap.set("entityRemove", this.onRemoved);
     eventMap.set("dataDrivenEntityTriggerEvent", this.onDataDrivenEvent);
     eventMap.set("entityLoad", this.onLoaded);
+
+    return eventMap;
+  }
+
+  getBeforeEventMap(): Map<string, Function> {
+    const eventMap = new Map<string, Function>();
+
+    eventMap.set("chatSend", this.onChat);
 
     return eventMap;
   }
