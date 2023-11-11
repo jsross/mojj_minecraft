@@ -11,7 +11,11 @@ export interface IWaypointRepository {
 export class WaypointRepository implements IWaypointRepository {
   private static PROPERTY_KEY: string = "mojj:waypoints";
 
-  constructor() {}
+  private readonly _schemaVersion: string;
+
+  constructor(schemaVersion: string) {
+    this._schemaVersion = schemaVersion;
+  }
 
   public getWaypoints(): Waypoint[] {
     var waypointDictionary = this.getWaypointDictionary();
@@ -55,9 +59,11 @@ export class WaypointRepository implements IWaypointRepository {
     let result = false;
 
     try {
-      this.getWaypoints();
+      var waypoints: { [key: string]: any } = this.getWaypoints();
 
-      result = true;
+      if (waypoints["version"] == this._schemaVersion) {
+        result = true;
+      }
     } catch (ex) {
       result = false;
     }

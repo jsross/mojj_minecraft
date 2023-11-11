@@ -5,20 +5,18 @@ import { BehaviorManager } from "./behavior_manager";
 import { WaypointBehavior } from "./waypoint_behavior";
 import { WaypointRepository } from "./waypoint_repository";
 
+const schemaVersion = "1.0.0";
+
 world.afterEvents.worldInitialize.subscribe((event: WorldInitializeAfterEvent) => {
   console.warn("Hello, world!");
 
-  system.afterEvents.scriptEventReceive.subscribe((event: any) => {
-    console.warn("scriptEventReceive: " + JSON.stringify(event));
-  });
-
   const areaCalculator = new AreaCalculator();
   const behaviorManager = new BehaviorManager();
-  const waypointRepository = new WaypointRepository();
-
-  waypointRepository.reset();
+  const waypointRepository = new WaypointRepository(schemaVersion);
 
   if (!waypointRepository.testRepository()) {
+    console.warn("Resetting waypoint repository");
+
     waypointRepository.reset();
   }
 

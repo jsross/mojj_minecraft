@@ -169,12 +169,12 @@ export class WaypointBehavior extends Behavior {
 
     let waypoint = waypoints[index] as Waypoint;
 
-    let dimenion = world.getDimension(waypoint.dimensionId);
+    let dimension = world.getDimension(waypoint.dimensionId);
 
     let options = {
       checkForBlocks: true,
       facingLocation: waypoint.facingLocation,
-      dimension: dimenion,
+      dimension: dimension,
     } as TeleportOptions;
 
     let teleportLocation = waypoint.teleportLocation as Vector3;
