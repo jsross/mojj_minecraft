@@ -6,7 +6,7 @@ export interface IWaypointRepository {
   getWaypoint(id: string): Waypoint;
   upsertWaypoint(waypoint: Waypoint): void;
   reset(): void;
-  removeWaypoint(id: string): void;
+  removeWaypoint(id: string): boolean;
 }
 
 export class WaypointRepository implements IWaypointRepository {
@@ -21,7 +21,7 @@ export class WaypointRepository implements IWaypointRepository {
   public getWaypoints(): Waypoint[] {
     var waypointDictionary = this.getWaypointDictionary();
 
-    var results = Object.values(waypointDictionary) as Waypoint[];
+    var results = Object.values(waypointDictionary.waypoints) as Waypoint[];
 
     return results;
   }
@@ -29,17 +29,17 @@ export class WaypointRepository implements IWaypointRepository {
   public getWaypoint(id: string): Waypoint {
     var dictionary = this.getWaypointDictionary();
 
-    var waypoint = dictionary[id] as Waypoint;
+    var waypoint = dictionary.waypoints[id] as Waypoint;
 
     return waypoint;
   }
 
   public upsertWaypoint(waypoint: Waypoint): void {
-    var waypointDictionary = this.getWaypointDictionary();
+    var dictionary = this.getWaypointDictionary();
 
-    waypointDictionary[waypoint.id] = waypoint;
+    dictionary.waypoints[waypoint.id] = waypoint;
 
-    this.saveWaypoints(waypointDictionary);
+    this.saveWaypoints(dictionary);
   }
 
   private saveWaypoints(waypoints: any): void {
@@ -48,21 +48,27 @@ export class WaypointRepository implements IWaypointRepository {
     world.setDynamicProperty(WaypointRepository.PROPERTY_KEY, waypointsString);
   }
 
-  public removeWaypoint(id: string): void {
+  public removeWaypoint(id: string): boolean {
     var waypointDictionary = this.getWaypointDictionary();
 
-    delete waypointDictionary[id];
+    if (waypointDictionary.waypoints[id] == null) {
+      return false;
+    }
+
+    delete waypointDictionary.waypoints[id];
 
     this.saveWaypoints(waypointDictionary);
+
+    return true;
   }
 
   public testRepository(): boolean {
     let result = false;
 
     try {
-      var waypoints: { [key: string]: any } = this.getWaypoints();
+      let dictionary: WaypointDictionary = this.getWaypointDictionary();
 
-      if (waypoints["version"] == this._schemaVersion) {
+      if (dictionary.version == this._schemaVersion) {
         result = true;
       }
     } catch (ex) {
@@ -72,22 +78,22 @@ export class WaypointRepository implements IWaypointRepository {
     return result;
   }
 
-  private getWaypointDictionary(): any {
-    let results = {} as any;
+  private getWaypointDictionary(): WaypointDictionary {
+    const waypointsString = world.getDynamicProperty(WaypointRepository.PROPERTY_KEY) as string;
+    const dictionary: WaypointDictionary = JSON.parse(waypointsString);
 
-    var waypointsString = world.getDynamicProperty(WaypointRepository.PROPERTY_KEY) as string;
-    var waypoints = JSON.parse(waypointsString);
-
-    for (const property in waypoints) {
-      let waypointObject: any = waypoints[property] as Waypoint;
-
-      results[property] = waypointObject;
-    }
-
-    return waypoints;
+    return dictionary;
   }
 
   public reset(): void {
-    world.setDynamicProperty(WaypointRepository.PROPERTY_KEY, JSON.stringify({}));
+    world.setDynamicProperty(
+      WaypointRepository.PROPERTY_KEY,
+      JSON.stringify({ version: this._schemaVersion, waypoints: {} })
+    );
   }
+}
+
+interface WaypointDictionary {
+  version: string;
+  waypoints: { [key: string]: Waypoint };
 }

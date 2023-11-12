@@ -3,10 +3,10 @@
   "minecraft:entity": {
     "description": {
       "identifier": "mojj:waypoint",
-      "runtime_identifier": "minecraft:armor_stand",
+      "runtime_identifier": "mojj:waypoint",
       "is_spawnable": true,
       "is_summonable": true,
-      "is_experimental": false
+      "is_experimental": true
     },
     "components": {
       "minecraft:type_family": {
@@ -37,9 +37,6 @@
       "minecraft:knockback_resistance": {
         "value": 1
       },
-      "minecraft:loot": {
-        "table": "loot_tables/entities/armor_stand.json"
-      },
       "minecraft:nameable": {
         "always_show": true,
         "default_trigger": {
@@ -61,18 +58,9 @@
 
     "events": {
       "mojj:waypoint:on_named": {
-        "sequence": [
-          {
-            "run_command": {
-              "command": ["say hello"]
-            }
-          },
-          {
-            "add": {
-              "component_groups": ["mojj:named_waypoint"]
-            }
-          }
-        ]
+        "add": {
+          "component_groups": ["mojj:named_waypoint"]
+        }
       }
     }
   }

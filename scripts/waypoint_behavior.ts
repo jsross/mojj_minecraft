@@ -104,37 +104,57 @@ export class WaypointBehavior extends Behavior {
 
   // Function to handle chat commands
   public onChat(event: ChatSendBeforeEvent): void {
+    console.warn("ChatSendBeforeEvent");
+
     const player = event.sender as Player;
-    const message = event.message;
-
-    const command = message.trim().toLowerCase();
-
-    console.warn("Command: ", command);
-
-    if (!command.startsWith("!wp")) {
-      return;
-    }
 
     if (!player.isOp()) {
       // Check if the player is an admin
       return;
     }
 
+    if (!event.message.startsWith("!wp")) {
+      return;
+    }
+
+    const messageParts = event.message.split(" "); // Split the message into parts
+    const command = messageParts[1]; // Get the command name
+    const args = messageParts.slice(2); // Get the arguments
+
     event.cancel = true; // Cancel the chat event
 
     switch (command) {
-      case "!wp listwaypoints":
+      case "list":
         this.listAllWaypoints(player);
         break;
-      case "!wp reset":
+      case "reset":
         this.resetWaypoints(player);
         break;
-      // ... handle other commands
+      case "remove":
+        this.removeWaypoint(player, args);
+        // ... handle other commands
+        break;
+      default:
+        player.sendMessage(`Invalid command: ${command}`);
+
+        break;
+    }
+  }
+
+  removeWaypoint(player: Player, args: string[]) {
+    const removed = this._waypointRepository.removeWaypoint(args[0]);
+
+    if (!removed) {
+      player.sendMessage("Waypoint not found");
+    } else {
+      player.sendMessage("Waypoint removed");
     }
   }
 
   // Function to list all waypoints
   private listAllWaypoints(player: Player): void {
+    console.log("Listing all waypoints");
+
     const waypoints = this._waypointRepository.getWaypoints();
 
     if (waypoints.length === 0) {
@@ -142,7 +162,8 @@ export class WaypointBehavior extends Behavior {
       return;
     }
 
-    const waypointList = waypoints.map((waypoint, index) => waypoint.toString()).join("\n");
+    const waypointList = waypoints.map((waypoint, index) => `${index}: ${waypoint.id} ${waypoint.name}`).join("\n");
+
     player.sendMessage(waypointList);
   }
 
