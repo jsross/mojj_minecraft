@@ -7,14 +7,17 @@ import {
   Player,
 } from "@minecraft/server";
 import "./player_extensions";
+import "./entity_extensions";
 import { AdminPickConfigModalForm } from "./admin_pick_config_modal_form";
 import { IAreaCalculator } from "./area_calculator";
 import { Behavior } from "./behavior";
 
-export class AdminPickBehavior implements Behavior {
+export class AdminPickBehavior extends Behavior {
   private areaCalculator: IAreaCalculator;
 
   constructor(areaCalculator: IAreaCalculator) {
+    super();
+
     this.areaCalculator = areaCalculator;
   }
 
@@ -70,18 +73,16 @@ export class AdminPickBehavior implements Behavior {
     form.show(player).then(this.handleFormResponse.bind(this, player, heldItem));
   }
 
-  onEvent(eventName: string, event: any): void {
-    const eventMap = this.getEventMap();
-    const handler = eventMap.get(eventName);
-    if (handler) {
-      handler(event);
-    }
-  }
-
-  getEventMap(): Map<string, Function> {
+  getAfterEventMap(): Map<string, Function> {
     const eventMap = new Map<string, Function>();
     eventMap.set("itemUse", this.onUsed);
     eventMap.set("entityHitBlock", this.onHitBlock);
+
+    return eventMap;
+  }
+
+  getBeforeEventMap(): Map<string, Function> {
+    const eventMap = new Map<string, Function>();
 
     return eventMap;
   }

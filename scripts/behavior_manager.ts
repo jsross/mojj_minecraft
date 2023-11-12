@@ -10,11 +10,24 @@ export class BehaviorManager {
 
   registerBehavior(behavior: Behavior): void {
     this.behaviors.push(behavior);
-    this.subscribeToEvents(behavior);
+    this.subscribeToAfterEvents(behavior);
+    this.subscribeToBeforeEvents(behavior);
   }
 
-  private subscribeToEvents(behavior: Behavior): void {
-    const eventMap = behavior.getEventMap();
+  private subscribeToBeforeEvents(behavior: Behavior): void {
+    const eventMap = behavior.getBeforeEventMap();
+
+    for (const [eventName, handler] of eventMap.entries()) {
+      // Dynamically subscribe based on event name
+      if ((world.beforeEvents as WorldAfterEvents)[eventName]) {
+        (world.beforeEvents as WorldAfterEvents)[eventName].subscribe(handler.bind(behavior));
+      }
+    }
+  }
+
+  private subscribeToAfterEvents(behavior: Behavior): void {
+    const eventMap = behavior.getAfterEventMap();
+
     for (const [eventName, handler] of eventMap.entries()) {
       // Dynamically subscribe based on event name
       if ((world.afterEvents as WorldAfterEvents)[eventName]) {
