@@ -5,25 +5,30 @@ const os = require("os");
 const spawn = require("child_process").spawn;
 const sourcemaps = require("gulp-sourcemaps");
 
-const PREVIEW_PATH =
-  "/AppData/Local/Packages/Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe/LocalState/games/com.mojang";
+const PREVIEW_PATH = "/AppData/Local/Packages/Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe/LocalState/games/com.mojang";
 const DEFAULT_PATH = "/AppData/Local/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang";
 
 // === CONFIGURABLE VARIABLES
 
-// Initial properties
 const config = {
   pack_prefix: "the_mojj",
   useMinecraftPreview: false, // Target the "Minecraft Preview" version of Minecraft
+  get bpfoldername() {
+    return `${this.pack_prefix}_bp`;
+  },
+  get rpfoldername() {
+    return `${this.pack_prefix}_rp`;
+  },
+  get localAppDataPath() {
+    return os.homedir() + (this.useMinecraftPreview ? PREVIEW_PATH : DEFAULT_PATH);
+  },
+  get devBpFolderPath() {
+    return `${this.localAppDataPath}/development_behavior_packs/${this.bpfoldername}`;
+  },
+  get devRpFolderPath() {
+    return `${this.localAppDataPath}/development_resource_packs/${this.rpfoldername}`;
+  },
 };
-
-// Add dependent properties
-config.bpfoldername = `${config.pack_prefix}_bp`;
-config.rpfoldername = `${config.pack_prefix}_rp`;
-config.localStatePath = config.useMinecraftPreview ? PREVIEW_PATH : DEFAULT_PATH;
-config.mcdir = os.homedir() + config.localStatePath;
-config.devBpFolderPath = `${config.mcdir}/development_behavior_packs/${config.bpfoldername}`;
-config.devRpFolderPath = `${config.mcdir}/development_resource_packs/${config.rpfoldername}`;
 
 // === END CONFIGURABLE VARIABLES
 
@@ -53,7 +58,7 @@ function clean_build() {
   return clean(["build/behavior_packs/", "build/resource_packs/"]);
 }
 
-function clean_localmc() {
+function clean_local_dev() {
   return clean([config.devBpFolderPath, config.devRpFolderPath], true);
 }
 
@@ -98,34 +103,28 @@ function deploy(src, dest) {
   return gulp.src([src + "/**/*"]).pipe(gulp.dest(dest));
 }
 
-function deploy_localmc_behavior_packs() {
+function deploy_behavior_pack_to_localmc_dev() {
   return deploy(`build/behavior_packs/${config.bpfoldername}`, config.devBpFolderPath);
 }
 
-function deploy_localmc_resource_packs() {
-  return deploy("build/resource_packs/" + config.rpfoldername, config.devRpFolderPath);
+function deploy_resource_pack_to_localmc_dev() {
+  return deploy(`build/resource_packs/${config.rpfoldername}`, config.devRpFolderPath);
 }
 
-const deploy_localmc = gulp.series(
-  clean_localmc,
-  gulp.parallel(deploy_localmc_behavior_packs, deploy_localmc_resource_packs)
+const deploy_local_dev = gulp.series(
+  clean_local_dev,
+  gulp.parallel(deploy_behavior_pack_to_localmc_dev, deploy_resource_pack_to_localmc_dev)
 );
 
 function watch() {
   return gulp.watch(
     ["scripts/**/*.ts", "behavior_packs/**/*", "resource_packs/**/*"],
-    gulp.series(build, deploy_localmc)
+    gulp.series(build, deploy_local_dev)
   );
 }
 
-exports.clean_build = clean_build;
-exports.copy_behavior_packs = copy_behavior_packs;
-exports.copy_resource_packs = copy_resource_packs;
-exports.compile_scripts = compile_scripts;
-exports.copy_content = copy_content;
 exports.build = build;
-exports.clean_localmc = clean_localmc;
-exports.deploy_localmc = deploy_localmc;
-exports.default = gulp.series(build, deploy_localmc);
-exports.clean = gulp.series(clean_build, clean_localmc);
-exports.watch = gulp.series(build, deploy_localmc, watch);
+exports.deploy_local_dev = deploy_local_dev;
+exports.default = gulp.series(build, deploy_local_dev);
+exports.clean = gulp.series(clean_build, clean_local_dev);
+exports.watch = gulp.series(build, deploy_local_dev, watch);
