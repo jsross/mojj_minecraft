@@ -1,13 +1,3 @@
-// === CONFIGURABLE VARIABLES
-
-const bpfoldername = "the_mojj_bp";
-const rpfoldername = "the_mojj_rp";
-const useMinecraftPreview = false; // Whether to target the "Minecraft Preview" version of Minecraft vs. the main store version of Minecraft
-const useMinecraftDedicatedServer = false; // Whether to use Bedrock Dedicated Server - see https://www.minecraft.net/download/server/bedrock
-const dedicatedServerPath = "C:/mc/bds/1.19.0/"; // if using Bedrock Dedicated Server, where to find the extracted contents of the zip package
-
-// === END CONFIGURABLE VARIABLES
-
 const gulp = require("gulp");
 const ts = require("gulp-typescript");
 const del = require("del");
@@ -15,26 +5,88 @@ const os = require("os");
 const spawn = require("child_process").spawn;
 const sourcemaps = require("gulp-sourcemaps");
 
-const worldsFolderName = useMinecraftDedicatedServer ? "worlds" : "minecraftWorlds";
+const PREVIEW_PATH =
+  "/AppData/Local/Packages/Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe/LocalState/games/com.mojang/";
+const DEFAULT_PATH = "/AppData/Local/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang/";
 
-const activeWorldFolderName = useMinecraftDedicatedServer ? "Bedrock level" : bpfoldername + "world";
+let activeServer = null;
 
-const mcdir = useMinecraftDedicatedServer
-  ? dedicatedServerPath
-  : os.homedir() +
-    (useMinecraftPreview
-      ? "/AppData/Local/Packages/Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe/LocalState/games/com.mojang/"
-      : "/AppData/Local/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang/");
+// === CONFIGURABLE VARIABLES
 
-function clean_build(callbackFunction) {
-  del(["build/behavior_packs/", "build/resource_packs/"]).then(
-    (value) => {
-      callbackFunction(); // success
-    },
-    (reason) => {
-      callbackFunction(); // error
-    }
-  );
+// Initial properties
+const config = {
+  pack_prefix: "the_mojj",
+  useMinecraftPreview: false, // Target the "Minecraft Preview" version of Minecraft
+  useMinecraftDedicatedServer: false, // Use Bedrock Dedicated Server
+  dedicatedServerPath: "C:/mc/bds/1.19.0/", // Path to Bedrock Dedicated Server package
+};
+
+// Add dependent properties
+config.bpfoldername = `${config.pack_prefix}_bp`;
+config.rpfoldername = `${config.pack_prefix}_rp`;
+config.worldsFolderName = config.useMinecraftDedicatedServer ? "worlds" : "minecraftWorlds";
+config.localStatePath = config.useMinecraftPreview ? PREVIEW_PATH : DEFAULT_PATH;
+config.activeWorldFolderName = config.useMinecraftDedicatedServer ? "Bedrock level" : `${config.bpfoldername}world`;
+config.mcdir = config.useMinecraftDedicatedServer ? config.dedicatedServerPath : os.homedir() + config.localStatePath;
+config.targetWorldPath = `${config.mcdir}${config.worldsFolderName}/${config.activeWorldFolderName}`;
+config.targetConfigPath = `${config.mcdir}config`;
+config.targetWorldBackupPath = `backups/worlds/${config.activeWorldFolderName}`;
+config.devConfigPath = "config";
+config.devWorldPath = "worlds/default";
+config.devWorldBackupPath = "backups/worlds/devdefault";
+config.devBpFolderPath = `${config.mcdir}development_behavior_packs/${config.bpfoldername}`;
+config.devRpFolderPath = `${config.mcdir}development_resource_packs/${config.rpfoldername}`;
+
+// === END CONFIGURABLE VARIABLES
+
+// === Clean
+function clean(paths, force = false) {
+  var promise = new Promise(function (resolve, reject) {
+    console.log("Cleaning:", paths);
+
+    del(paths, { force }).then(
+      () => {
+        console.log("Clean successful:", paths);
+
+        resolve();
+      },
+      (error) => {
+        console.error("Clean failed:", paths, error);
+
+        reject();
+      }
+    );
+  });
+
+  return promise;
+}
+
+function clean_build() {
+  return clean(["build/behavior_packs/", "build/resource_packs/"]);
+}
+
+function clean_localmc() {
+  return clean([config.devBpFolderPath, config.devRpFolderPath], true);
+}
+
+function clean_localmc_world() {
+  return clean([config.targetWorldPath], true);
+}
+
+function clean_localmc_config() {
+  return clean([config.targetConfigPath], true);
+}
+
+function clean_dev_world() {
+  clean([config.devWorldPath], true);
+}
+
+function clean_localmc_world_backup() {
+  clean([config.targetWorldBackupPath], true);
+}
+
+function clean_dev_world_backup() {
+  clean([config.devWorldBackupPath], true);
 }
 
 function copy_behavior_packs() {
@@ -62,180 +114,59 @@ function compile_scripts() {
       })
     )
     .pipe(
-      sourcemaps.write("../../_" + bpfoldername + "Debug", {
-        destPath: bpfoldername + "/scripts/",
+      sourcemaps.write("../../_" + config.bpfoldername + "Debug", {
+        destPath: config.bpfoldername + "/scripts/",
         sourceRoot: "./../../../scripts/",
       })
     )
-    .pipe(gulp.dest("build/behavior_packs/" + bpfoldername + "/scripts"));
+    .pipe(gulp.dest("build/behavior_packs/" + config.bpfoldername + "/scripts"));
 }
 
 const build = gulp.series(clean_build, copy_content, compile_scripts);
 
-function clean_localmc(callbackFunction) {
-  if (!bpfoldername || !bpfoldername.length || bpfoldername.length < 2) {
-    console.log("No bpfoldername specified.");
-    callbackFunction();
-    return;
-  }
-
-  del([mcdir + "development_behavior_packs/" + bpfoldername, mcdir + "development_resource_packs/" + rpfoldername], {
-    force: true,
-  }).then(
-    (value) => {
-      callbackFunction(); // Success
-    },
-    (reason) => {
-      callbackFunction(); // Error
-    }
-  );
-}
-
 function deploy_localmc_behavior_packs() {
-  console.log("Deploying to '" + mcdir + "development_behavior_packs/" + bpfoldername + "'");
-  return gulp
-    .src(["build/behavior_packs/" + bpfoldername + "/**/*"])
-    .pipe(gulp.dest(mcdir + "development_behavior_packs/" + bpfoldername));
+  console.log(`Deploying to ${config.devBpFolderPath}`);
+
+  return gulp.src(["build/behavior_packs/" + config.bpfoldername + "/**/*"]).pipe(gulp.dest(config.devBpFolderPath));
 }
 
 function deploy_localmc_resource_packs() {
-  return gulp
-    .src(["build/resource_packs/" + rpfoldername + "/**/*"])
-    .pipe(gulp.dest(mcdir + "development_resource_packs/" + rpfoldername));
-}
-
-function getTargetWorldPath() {
-  return mcdir + worldsFolderName + "/" + activeWorldFolderName;
-}
-
-function getTargetConfigPath() {
-  return mcdir + "config";
-}
-
-function getTargetWorldBackupPath() {
-  return "backups/worlds/" + activeWorldFolderName;
-}
-
-function getDevConfigPath() {
-  return "config";
-}
-
-function getDevWorldPath() {
-  return "worlds/default";
-}
-
-function getDevWorldBackupPath() {
-  return "backups/worlds/devdefault";
-}
-
-function clean_localmc_world(callbackFunction) {
-  console.log("Removing '" + getTargetWorldPath() + "'");
-
-  del([getTargetWorldPath()], {
-    force: true,
-  }).then(
-    (value) => {
-      callbackFunction(); // Success
-    },
-    (reason) => {
-      callbackFunction(); // Error
-    }
-  );
-}
-
-function clean_localmc_config(callbackFunction) {
-  console.log("Removing '" + getTargetConfigPath() + "'");
-
-  del([getTargetConfigPath()], {
-    force: true,
-  }).then(
-    (value) => {
-      callbackFunction(); // Success
-    },
-    (reason) => {
-      callbackFunction(); // Error
-    }
-  );
-}
-
-function clean_dev_world(callbackFunction) {
-  console.log("Removing '" + getDevWorldPath() + "'");
-
-  del([getDevWorldPath()], {
-    force: true,
-  }).then(
-    (value) => {
-      callbackFunction(); // Success
-    },
-    (reason) => {
-      callbackFunction(); // Error
-    }
-  );
-}
-
-function clean_localmc_world_backup(callbackFunction) {
-  console.log("Removing backup'" + getTargetWorldBackupPath() + "'");
-
-  del([getTargetWorldBackupPath()], {
-    force: true,
-  }).then(
-    (value) => {
-      callbackFunction(); // Success
-    },
-    (reason) => {
-      callbackFunction(); // Error
-    }
-  );
-}
-
-function clean_dev_world_backup(callbackFunction) {
-  console.log("Removing backup'" + getDevWorldBackupPath() + "'");
-
-  del([getTargetWorldBackupPath()], {
-    force: true,
-  }).then(
-    (value) => {
-      callbackFunction(); // Success
-    },
-    (reason) => {
-      callbackFunction(); // Error
-    }
-  );
+  return gulp.src(["build/resource_packs/" + config.rpfoldername + "/**/*"]).pipe(gulp.dest(config.devRpFolderPath));
 }
 
 function backup_dev_world() {
-  console.log("Copying world '" + getDevWorldPath() + "' to '" + getDevWorldBackupPath() + "'");
+  console.log("Copying world '" + config.devWorldPath + "' to '" + config.devWorldBackupPath + "'");
   return gulp
-    .src([getTargetWorldPath() + "/**/*"])
-    .pipe(gulp.dest(getDevWorldBackupPath() + "/worlds/" + activeWorldFolderName));
+    .src([config.targetWorldPath + "/**/*"])
+    .pipe(gulp.dest(config.devWorldBackupPath + "/worlds/" + config.activeWorldFolderName));
 }
 
 function deploy_localmc_config() {
-  console.log("Copying world 'config/' to '" + getTargetConfigPath() + "'");
-  return gulp.src([getDevConfigPath() + "/**/*"]).pipe(gulp.dest(getTargetConfigPath()));
+  console.log("Copying world 'config/' to '" + config.targetConfigPath + "'");
+  return gulp.src([config.devConfigPath + "/**/*"]).pipe(gulp.dest(config.targetConfigPath));
 }
 
 function deploy_localmc_world() {
-  console.log("Copying world 'worlds/default/' to '" + getTargetWorldPath() + "'");
-  return gulp.src([getDevWorldPath() + "/**/*"]).pipe(gulp.dest(getTargetWorldPath()));
+  console.log("Copying world 'worlds/default/' to '" + config.targetWorldPath + "'");
+  return gulp.src([config.devWorldPath + "/**/*"]).pipe(gulp.dest(config.targetWorldPath));
 }
 
 function ingest_localmc_world() {
-  console.log("Ingesting world '" + getTargetWorldPath() + "' to '" + getDevWorldPath() + "'");
-  return gulp.src([getTargetWorldPath() + "/**/*"]).pipe(gulp.dest(getDevWorldPath()));
+  console.log("Ingesting world '" + config.targetWorldPath + "' to '" + config.devWorldPath + "'");
+  return gulp.src([config.targetWorldPath + "/**/*"]).pipe(gulp.dest(config.devWorldPath));
 }
 
 function backup_localmc_world() {
-  console.log("Copying world '" + getTargetWorldPath() + "' to '" + getTargetWorldBackupPath() + "/'");
+  console.log("Copying world '" + config.targetWorldPath + "' to '" + config.targetWorldBackupPath + "/'");
   return gulp
-    .src([getTargetWorldPath() + "/**/*"])
-    .pipe(gulp.dest(getTargetWorldBackupPath() + "/" + activeWorldFolderName));
+    .src([config.targetWorldPath + "/**/*"])
+    .pipe(gulp.dest(config.targetWorldBackupPath + "/" + config.activeWorldFolderName));
 }
 
 const deploy_localmc = gulp.series(
   clean_localmc,
   function (callbackFunction) {
-    if (!useMinecraftDedicatedServer) {
+    if (!config.useMinecraftDedicatedServer) {
       console.log("\007"); // annunciate a beep!
     }
     callbackFunction();
@@ -257,24 +188,13 @@ function serve() {
   );
 }
 
-let activeServer = null;
-
-function stopServer(callbackFunction) {
-  if (activeServer) {
-    activeServer.stdin.write("stop\n");
-    activeServer = null;
-  }
-
-  callbackFunction();
-}
-
 function startServer(callbackFunction) {
   if (activeServer) {
     activeServer.stdin.write("stop\n");
     activeServer = null;
   }
 
-  activeServer = spawn(dedicatedServerPath + "bedrock_server");
+  activeServer = spawn(config.dedicatedServerPath + "bedrock_server");
 
   let logBuffer = "";
 
@@ -299,6 +219,15 @@ function startServer(callbackFunction) {
 
   activeServer.stdout.on("data", serverLogger);
   activeServer.stderr.on("data", serverLogger);
+
+  callbackFunction();
+}
+
+function stopServer(callbackFunction) {
+  if (activeServer) {
+    activeServer.stdin.write("stop\n");
+    activeServer = null;
+  }
 
   callbackFunction();
 }
