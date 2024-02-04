@@ -22,10 +22,10 @@ const config = {
   get localAppDataPath() {
     return os.homedir() + (this.useMinecraftPreview ? PREVIEW_PATH : DEFAULT_PATH);
   },
-  get devBpFolderPath() {
+  get localDevBpFolder() {
     return `${this.localAppDataPath}/development_behavior_packs/${this.bpfoldername}`;
   },
-  get devRpFolderPath() {
+  get localDevRpFolder() {
     return `${this.localAppDataPath}/development_resource_packs/${this.rpfoldername}`;
   },
 };
@@ -54,23 +54,35 @@ function clean(paths, force = false) {
   return promise;
 }
 
-function clean_build() {
-  return clean(["build/behavior_packs/", "build/resource_packs/"]);
+function deploy(src, dest) {
+  console.log(`Deploying from ${src} to ${dest}`);
+
+  return gulp.src([src + "/**/*"]).pipe(gulp.dest(dest));
 }
 
-function clean_local_dev() {
-  return clean([config.devBpFolderPath, config.devRpFolderPath], true);
+function clean_bp_build_folder() {
+  return clean(["build/behavior_packs/"]);
+}
+
+function clean_rp_build_folder() {
+  return clean(["build/resource_packs/"]);
+}
+
+function clean_bp_deploy_folder() {
+  return clean([config.localDevBpFolder], true);
+}
+
+function clean_rp_deploy_folder() {
+  return clean([config.localDevRpFolder], true);
 }
 
 function copy_behavior_packs() {
   return gulp.src(["behavior_packs/**/*"]).pipe(gulp.dest("build/behavior_packs"));
 }
 
-function copy_resource_packs() {
+function build_resource_pack() {
   return gulp.src(["resource_packs/**/*"]).pipe(gulp.dest("build/resource_packs"));
 }
-
-const copy_content = gulp.parallel(copy_behavior_packs, copy_resource_packs);
 
 function compile_scripts() {
   return gulp
@@ -95,36 +107,34 @@ function compile_scripts() {
     .pipe(gulp.dest("build/behavior_packs/" + config.bpfoldername + "/scripts"));
 }
 
-const build = gulp.series(clean_build, copy_content, compile_scripts);
-
-function deploy(src, dest) {
-  console.log(`Deploying from ${src} to ${dest}`);
-
-  return gulp.src([src + "/**/*"]).pipe(gulp.dest(dest));
-}
-
 function deploy_behavior_pack_to_localmc_dev() {
-  return deploy(`build/behavior_packs/${config.bpfoldername}`, config.devBpFolderPath);
+  return deploy(`build/behavior_packs/${config.bpfoldername}`, config.localDevBpFolder);
 }
 
 function deploy_resource_pack_to_localmc_dev() {
-  return deploy(`build/resource_packs/${config.rpfoldername}`, config.devRpFolderPath);
+  return deploy(`build/resource_packs/${config.rpfoldername}`, config.localDevRpFolder);
 }
-
-const deploy_local_dev = gulp.series(
-  clean_local_dev,
-  gulp.parallel(deploy_behavior_pack_to_localmc_dev, deploy_resource_pack_to_localmc_dev)
-);
 
 function watch() {
   return gulp.watch(
     ["scripts/**/*.ts", "behavior_packs/**/*", "resource_packs/**/*"],
-    gulp.series(build, deploy_local_dev)
+    gulp.series(exports.build_all, exports.deploy_all_to_dev)
   );
 }
 
-exports.build = build;
-exports.deploy_local_dev = deploy_local_dev;
-exports.default = gulp.series(build, deploy_local_dev);
-exports.clean = gulp.series(clean_build, clean_local_dev);
-exports.watch = gulp.series(build, deploy_local_dev, watch);
+exports.build_bp = gulp.series(clean_bp_build_folder, copy_behavior_packs, compile_scripts);
+exports.build_rp = gulp.series(clean_rp_build_folder, build_resource_pack);
+exports.build_all = gulp.parallel(exports.build_bp, exports.build_rp);
+
+exports.deploy_bp_to_dev = gulp.series(clean_bp_deploy_folder, deploy_behavior_pack_to_localmc_dev);
+exports.deploy_rp_to_dev = gulp.series(clean_rp_deploy_folder, deploy_resource_pack_to_localmc_dev);
+exports.deploy_all_to_dev = gulp.parallel(exports.deploy_bp_to_dev, exports.deploy_rp_to_dev);
+
+exports.default = gulp.series(exports.build_all, exports.deploy_all_to_dev);
+exports.clean_all = gulp.parallel(
+  clean_bp_build_folder,
+  clean_rp_build_folder,
+  clean_bp_deploy_folder,
+  clean_rp_deploy_folder
+);
+exports.watch = gulp.series(exports.default, watch);
