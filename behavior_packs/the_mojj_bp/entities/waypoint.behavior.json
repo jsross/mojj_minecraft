@@ -10,32 +10,18 @@
     },
     "components": {
       "minecraft:type_family": {
-        "family": ["armor_stand", "inanimate", "mob"]
+        "family": ["inanimate", "mob"]
       },
       "minecraft:collision_box": {
         "width": 0.5,
         "height": 1.975
       },
-      "minecraft:health": {
-        "value": 6,
-        "max": 6
+      "minecraft:physics": {
+        "has_gravity": true,
+        "has_collision": true
       },
-      "minecraft:hurt_on_condition": {
-        "damage_conditions": [
-          {
-            "filters": {
-              "test": "in_lava",
-              "subject": "self",
-              "operator": "==",
-              "value": true
-            },
-            "cause": "lava",
-            "damage_per_tick": 4
-          }
-        ]
-      },
-      "minecraft:knockback_resistance": {
-        "value": 1
+      "minecraft:pushable": {
+        "is_pushable": false
       },
       "minecraft:nameable": {
         "always_show": true,
@@ -44,13 +30,7 @@
           "target": "self"
         }
       },
-      "minecraft:persistent": {},
-      "minecraft:physics": {},
-      "minecraft:pushable": {
-        "is_pushable": false,
-        "is_pushable_by_piston": true
-      },
-      "minecraft:conditional_bandwidth_optimization": {}
+      "minecraft:persistent": {}
     },
     "component_groups": {
       "mojj:named_waypoint": {}

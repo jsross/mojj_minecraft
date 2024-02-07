@@ -1,25 +1,22 @@
 {
-  "format_version": "1.10.0",
-  "minecraft:client_entity": {
-    "description": {
-      "identifier": "mojj:waypoint",
-      "min_engine_version": "1.8.0",
-      "materials": {
-        "default": "entity_alphatest"
-      },
-      "textures": {
-        "default": "textures/entity/waypoint"
-      },
-      "scripts": {},
-      "geometry": {
-        "default": "geometry.waypoint"
-      },
-      "render_controllers": ["controller.render.armor_stand"],
-      "enable_attachables": true,
-      "spawn_egg": {
-        "base_color": "#1ec5b7",
-        "overlay_color": "#ffffff"
-      }
-    }
-  }
+	"format_version": "1.10.0",
+	"minecraft:client_entity": {
+		"description": {
+			"identifier": "mojj:waypoint",
+			"materials": {
+				"default": "entity_alphatest"
+			},
+			"textures": {
+				"default": "textures/entity/waypoint"
+			},
+			"geometry": {
+				"default": "geometry.waypoint"
+			},
+			"render_controllers": ["controller.render.default"],
+			"spawn_egg": {
+				"base_color": "#6f989a",
+				"overlay_color": "#1cc0f2"
+			}
+		}
+	}
 }
