@@ -1,0 +1,10 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.waypoint": {
+      "geometry": "geometry.waypoint",
+      "materials": [{ "*": "material.waypoint_transparent" }],
+      "textures": ["textures/entity/waypoint"]
+    }
+  }
+}

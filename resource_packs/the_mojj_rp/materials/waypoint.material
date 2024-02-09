@@ -1,0 +1,11 @@
+{
+  "materials": {
+    "format_version": "1.10.0",
+    "waypoint_transparent": {
+      "render_method": "alpha_test",
+      "face_culling": "none",
+      "texture": "textures/entity/waypoint",
+      "blend_mode": "blend"
+    }
+  }
+}
