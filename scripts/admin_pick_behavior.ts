@@ -99,7 +99,7 @@ export class AdminPickBehavior extends Behavior {
 
       const inventory = player.getComponent("inventory") as EntityInventoryComponent;
 
-      inventory.container.setItem(player.selectedSlot, heldItem);
+      inventory.container?.setItem(player.selectedSlot, heldItem);
     }
   }
 
