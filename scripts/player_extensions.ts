@@ -10,7 +10,7 @@ declare module "@minecraft/server" {
   let inventory = this.getComponent("inventory") as EntityInventoryComponent;
   let heldItemSlot = this.selectedSlot;
 
-  let heldItem = inventory.container.getItem(heldItemSlot);
+  let heldItem = inventory.container?.getItem(heldItemSlot);
 
   return heldItem || null;
 };
